@@ -1,0 +1,36 @@
+.addItemWrapper {
+    display: flex;
+    margin-bottom: 20px;
+    width: calc(100% - 40px);
+}
+
+.input {
+    width: 100%;
+    border: none;
+    height: 30px;
+    border-radius: 5px 0 0 5px;
+    background-color: rgb(84, 84, 87);
+    padding: 5px 15px;
+    color: white;
+}
+
+.input::placeholder {
+    color: rgb(174, 177, 174);
+}
+
+.input:focus {
+    outline: none;
+}
+
+.input:focus::placeholder {
+    color: transparent;
+}
+
+.button {
+    background-color: rgb(84, 84, 87);
+    border: 0;
+    border-radius: 0 5px 5px 0;
+    padding-right: 15px;
+    color: white;
+    font-size: 30px;
+}

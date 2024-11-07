@@ -1,0 +1,31 @@
+.taskWrapper {
+    min-height: 20px;
+    background-color: transparent;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    cursor: pointer;
+    position: relative;
+}
+
+.strikethrough::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 97%;
+    margin: 0 auto;
+    height: 2px;
+    background-color: #373937;
+    transform: translate(-50%);
+}
+
+.taskText {
+    width: 100%;
+}
+
+.taskText.isDone {
+    color: #ccc;
+}
