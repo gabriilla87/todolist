@@ -13,7 +13,10 @@ export const AddItemForm = ({addItem}: Props) => {
     }
 
     const onEnterPressHandler = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.code === "Enter") addItemHandler()
+        if (e.code === "Enter") {
+            addItemHandler()
+            alert("You are pressed Enter")
+        }
     }
 
     const addItemHandler = () => {

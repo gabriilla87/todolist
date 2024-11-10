@@ -1,5 +1,6 @@
 .todolistWrapper {
-    width: calc(100% - 80px);
+    max-width: 100%;
+    width: 100%;
     transition: max-height 0.5s ease;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -8,6 +9,16 @@
     background-color: #f9f9f9;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+}
+
+@media screen and (max-width: 576px){
+    .todolistWrapper {
+        padding: 5px;
+    }
+    .openTodosBlock {
+        font-size: 14px;
+    }
 }
 
 .todosHeader:hover::before {
@@ -26,10 +37,10 @@
     position: absolute;
     content: "";
     background-color: transparent;
-    top: -5px;
-    right: -20px;
-    left: -20px;
-    bottom: -5px;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
     border-radius: 5px 5px 0 0;
     z-index: -1
 }

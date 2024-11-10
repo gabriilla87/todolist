@@ -1,8 +1,13 @@
 import React, {useState} from 'react';
 import s from "./Task.module.css"
 import TaskStatus from "../TaskStatus/TaskStatus";
+import {DomainTask} from "../../bll/reducers/taskReducer";
 
-export const Task = () => {
+type Props = {
+    task: DomainTask
+}
+
+export const Task = ({task}: Props) => {
     const [isDone, setIsDone] = useState(false);
 
     const switchIsStrikethrough = () => {
@@ -15,7 +20,7 @@ export const Task = () => {
                 className={`${s.taskText} ${isDone ? s.isDone : ""}`}
                 onClick={switchIsStrikethrough}
             >
-                default text
+                {task.title}
             </span>
             <TaskStatus level={4} isDone={isDone}/>
         </div>
