@@ -28,7 +28,7 @@ function App() {
             <Container>
                 <AddItemForm addItem={addTodolistHandler}/>
                 {todolists?.map(tl => <Todolist key={tl.id} todolist={tl}/>)}
-w            </Container>
+            </Container>
         </Wrapper>
     );
 }
