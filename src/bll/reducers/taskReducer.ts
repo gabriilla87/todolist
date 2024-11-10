@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {addTodolist} from "./todolistReducer";
+import {addTodolist, removeTodolist} from "./todolistReducer";
 
 export const taskSlice = createSlice({
     name: 'tasks',
@@ -21,19 +21,45 @@ export const taskSlice = createSlice({
                 id: id,
                 todoListId: todolistId,
                 order: 0,
-                addedDate: ""
+                addedDate: "",
+                isEditMode: false,
             }
             state[todolistId].push(task)
+        },
+        changeTaskEditMode: (state, action: PayloadAction<{
+            todolistId: string,
+            taskId: string,
+            isEditMode: boolean
+        }>) => {
+            const {todolistId, taskId, isEditMode} = action.payload
+            const task = state[todolistId].find(t => t.id === taskId)
+            if (task) task.isEditMode = isEditMode
+        },
+        changeTaskTitle: (state, action: PayloadAction<{ todolistId: string, taskId: string, title: string }>) => {
+            const {todolistId, taskId, title} = action.payload
+            const task = state[todolistId].find(t => t.id === taskId)
+            if (task) task.title = title
+        },
+        removeTask: (state, action: PayloadAction<{ todolistId: string, taskId: string }>) => {
+            const {todolistId, taskId} = action.payload
+            const index = state[todolistId].findIndex(t => t.id === taskId)
+            if (index !== -1) {
+                state[todolistId].splice(index, 1)
+            }
         }
     },
     extraReducers: builder => {
-        builder.addCase(addTodolist, (state, action) => {
-            state[action.payload.id] = []
-        })
+        builder
+            .addCase(addTodolist, (state, action) => {
+                state[action.payload.id] = []
+            })
+            .addCase(removeTodolist, (state, action) => {
+               delete state[action.payload.todolistId]
+            })
     }
 })
 
-export const {addTask} = taskSlice.actions
+export const {addTask, changeTaskEditMode, changeTaskTitle, removeTask} = taskSlice.actions
 export const tasksReducer = taskSlice.reducer
 
 export type DomainTask = {
@@ -47,6 +73,7 @@ export type DomainTask = {
     todoListId: string
     order: number
     addedDate: string
+    isEditMode: boolean
 }
 
 export type TasksState = {

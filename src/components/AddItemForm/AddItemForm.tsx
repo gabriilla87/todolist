@@ -3,12 +3,13 @@ import s from "./AddItemForm.module.css"
 
 type Props = {
     addItem: (title: string) => void
+    placeholder: string
 }
 
-export const AddItemForm = ({addItem}: Props) => {
+export const AddItemForm = ({addItem, placeholder}: Props) => {
     const [inputValue, setInputValue] = useState("")
 
-    const changeInputValue = (e: ChangeEvent<HTMLInputElement>) => {
+    const changeInputValueHandler = (e: ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.currentTarget.value)
     }
 
@@ -25,10 +26,10 @@ export const AddItemForm = ({addItem}: Props) => {
         <div className={s.addItemWrapper}>
             <input
                 value={inputValue}
-                onChange={changeInputValue}
+                onChange={changeInputValueHandler}
                 onKeyUp={onEnterPressHandler}
                 className={s.input}
-                placeholder={"Todolist title"}
+                placeholder={placeholder}
             />
             <button
                 onClick={addItemHandler}

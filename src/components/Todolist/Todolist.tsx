@@ -4,27 +4,50 @@ import {CollapseArrow} from "../CollapseArrow/CollapseArrow";
 import {AddItemForm} from "../AddItemForm/AddItemForm";
 import {RootState, useAppDispatch} from "../../bll/store";
 import {useSelector} from "react-redux";
-import {addTask, TasksState} from "../../bll/reducers/taskReducer";
+import {addTask, DomainTask} from "../../bll/reducers/taskReducer";
 import {Task} from "../Task/Task";
-import {DomainTodolist} from "../../bll/reducers/todolistReducer";
+import {
+    changeTodolistEditMode,
+    changeTodolistTitle,
+    DomainTodolist,
+    removeTodolist
+} from "../../bll/reducers/todolistReducer";
 import {v1} from "uuid";
+import {CRUDButtons} from "../CRUDButtonsWrapper/CRUDButtons";
+import {EditableSpan} from "../EditableSpan/EditableSpan";
 
 type Props = {
     todolist: DomainTodolist
 }
 
 export const Todolist = ({todolist}: Props) => {
-    const {title, id} = todolist
+    const {title, id: todolistId, isEditMode} = todolist
 
     const [isOpen, toggleIsOpen] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null);
 
     const dispatch = useAppDispatch()
-    const tasks = useSelector<RootState, TasksState>(state => state.tasks)
+    const tasks = useSelector<RootState, DomainTask[]>(state => state.tasks[todolistId])
 
     const toggleOpen = () => {
         toggleIsOpen(prev => !prev);
     };
+
+    const addTaskHandler = (title: string) => {
+        dispatch(addTask({todolistId, id: v1(), title}))
+    }
+
+    const removeTodolistHandler = () => {
+        dispatch(removeTodolist({todolistId}))
+    }
+
+    const changeTodolistTitleHandler = (title: string) => {
+        dispatch(changeTodolistTitle({todolistId, title}))
+    }
+
+    const changeTodolistEditModeHandler = (isEditMode: boolean) => {
+        dispatch(changeTodolistEditMode({todolistId, isEditMode}))
+    }
 
     useEffect(() => {
         if (contentRef.current) {
@@ -33,17 +56,24 @@ export const Todolist = ({todolist}: Props) => {
         }
     }, [isOpen, tasks]);
 
-    const addTaskHandler = (title: string) => {
-        dispatch(addTask({todolistId: id, id: v1(), title}))
-    }
-
     return (
         <div className={s.todolistWrapper}>
             <div className={s.todosHeader} onClick={toggleOpen}>
-                <div className={s.todosHeaderText}>
-                    <span className={s.todolistTitle}>{title || 1}</span>
-                    <span className={s.numOfTasks}>Tasks: 5</span>
-                </div>
+                <div className={s.todosHeaderLeftSide}>
+                    <div className={s.todosHeaderText}>
+                        <EditableSpan
+                            isEditMode={isEditMode}
+                            title={title}
+                            changeItemTitle={changeTodolistTitleHandler}
+                            changeItemEditMode={changeTodolistEditModeHandler}
+                        />
+                        <span className={s.numOfTasks}>Tasks: {tasks.length}</span>
+                    </div>
+                    <CRUDButtons
+                        removeItem={removeTodolistHandler}
+                        changeItemEditMode={changeTodolistEditModeHandler}
+                        isEditMode={isEditMode}
+                    />                </div>
                 <CollapseArrow isOpen={isOpen}/>
             </div>
             <div
@@ -54,8 +84,8 @@ export const Todolist = ({todolist}: Props) => {
                 }}
             >
                 <span className={s.underline} style={{margin: isOpen ? "0 auto 10px" : "0 auto"}}></span>
-                <AddItemForm addItem={addTaskHandler}/>
-                {tasks[id].map(el => <Task task={el}/>)}
+                <AddItemForm addItem={addTaskHandler} placeholder={"Task title"}/>
+                {tasks.map(el => <Task task={el} todolistId={todolistId}/>)}
             </div>
         </div>
     );

@@ -26,7 +26,7 @@ function App() {
         <Wrapper>
             <Header/>
             <Container>
-                <AddItemForm addItem={addTodolistHandler}/>
+                <AddItemForm addItem={addTodolistHandler} placeholder={"Todolist title"}/>
                 {todolists?.map(tl => <Todolist key={tl.id} todolist={tl}/>)}
             </Container>
         </Wrapper>

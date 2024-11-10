@@ -1,0 +1,28 @@
+.editableSpanWrapper {
+    justify-self: flex-start;
+    position: relative;
+}
+
+.input {
+
+}
+.strikethrough::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 110%;
+    margin: 0 auto;
+    height: 2px;
+    background-color: #373937;
+    transform: translate(-50%);
+}
+
+.taskText {
+    max-width: 100%;
+    width: 100%;
+}
+
+.taskText.isDone {
+    color: #ccc;
+}

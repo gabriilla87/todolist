@@ -5,29 +5,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 10px;
-    cursor: pointer;
+    padding: 5px;
     position: relative;
 }
 
-.strikethrough::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 97%;
-    margin: 0 auto;
-    height: 2px;
-    background-color: #373937;
-    transform: translate(-50%);
+.checkboxAndTitleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px
 }
-
-.taskText {
-    max-width: 100%;
-    width: 100%;
-}
-
-.taskText.isDone {
-    color: #ccc;
-}
-
