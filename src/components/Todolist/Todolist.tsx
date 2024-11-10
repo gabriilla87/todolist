@@ -67,7 +67,7 @@ export const Todolist = ({todolist}: Props) => {
                             changeItemTitle={changeTodolistTitleHandler}
                             changeItemEditMode={changeTodolistEditModeHandler}
                         />
-                        <span className={s.numOfTasks}>Tasks: {tasks.length}</span>
+                        <span className={s.numOfTasks}>Tasks: 0</span>
                     </div>
                     <CRUDButtons
                         removeItem={removeTodolistHandler}
@@ -85,7 +85,7 @@ export const Todolist = ({todolist}: Props) => {
             >
                 <span className={s.underline} style={{margin: isOpen ? "0 auto 10px" : "0 auto"}}></span>
                 <AddItemForm addItem={addTaskHandler} placeholder={"Task title"}/>
-                {tasks.map(el => <Task task={el} todolistId={todolistId}/>)}
+                {tasks?.map(el => <Task task={el} todolistId={todolistId}/>)}
             </div>
         </div>
     );
