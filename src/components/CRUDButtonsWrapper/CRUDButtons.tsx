@@ -1,7 +1,5 @@
 import React from 'react';
-import {Button} from "../DeleteButton/Button";
-import DeleteButtonIcon from "../../assets/svg/delete-2-svgrepo-com.svg";
-import RenameButtonIcon from "../../assets/svg/pencil-svgrepo-com.svg";
+import {Button, SvgProps} from "../Button/Button";
 import s from './CRUDButtonsWrapper.module.css';
 
 type Props = {
@@ -19,10 +17,23 @@ export const CRUDButtons = ({changeItemEditMode, removeItem, isEditMode}: Props)
         removeItem()
     }
 
+    const svgObjs: SvgProps[] = [
+        {
+            id: "changeIcon",
+            viewBox: "0 0 192 192",
+            onClick: changeItemEditModeHandler
+        },
+        {
+            id: "deleteIcon",
+            viewBox: "0 0 24 24",
+            onClick: removeTaskHandler,
+        },
+    ]
+
     return (
         <div className={s.buttonsWrapper}>
-            <Button onClick={changeItemEditModeHandler} imgSrc={RenameButtonIcon} disabled={isEditMode}/>
-            <Button onClick={removeTaskHandler} imgSrc={DeleteButtonIcon} disabled={isEditMode}/>
+            {isEditMode && <div className={s.hideButtonsWrapper}/>}
+            {svgObjs.map(o => <Button key={o.id} svgProps={o} disabled={isEditMode}/>)}
         </div>
     );
 };

@@ -3,10 +3,9 @@ import s from './Todolist.module.css'
 import {CollapseArrow} from "../CollapseArrow/CollapseArrow";
 import {AddItemForm} from "../AddItemForm/AddItemForm";
 import {Task} from "../Task/Task";
-import {DomainTodolist} from "../../bll/reducers/todolistsSlice";
 import {CRUDButtons} from "../CRUDButtonsWrapper/CRUDButtons";
 import {EditableSpan} from "../EditableSpan/EditableSpan";
-import {useRemoveTodolistMutation, useUpdateTodolistTitleMutation} from "../../dal/api/todolistsApi";
+import {DomainTodolist, useRemoveTodolistMutation, useUpdateTodolistTitleMutation} from "../../dal/api/todolistsApi";
 import {tasksApi, useAddTaskMutation, useGetTasksQuery} from "../../dal/api/tasksApi";
 import {useAppDispatch} from "../../bll/store";
 

@@ -1,5 +1,4 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
-import {DomainTodolist} from "../../bll/reducers/todolistsSlice";
 
 export type CommonResponse<T = {}> = {
     data?: T
@@ -14,6 +13,9 @@ export type TodolistsResponse = {
     title: string
 }
 
+export type DomainTodolist = TodolistsResponse & {
+    isEditMode: boolean
+}
 
 export const todolistsApi = createApi({
     reducerPath: 'todolistsApi',
