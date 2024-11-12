@@ -1,4 +1,4 @@
-import React, {ChangeEvent} from 'react';
+import React from 'react';
 import s from "./Task.module.css"
 import {CRUDButtons} from "../CRUDButtonsWrapper/CRUDButtons";
 import {EditableSpan} from "../EditableSpan/EditableSpan";
@@ -23,8 +23,8 @@ export const Task = ({task, changeTaskEditMode}: Props) => {
     }
 
     const TaskStatuses = {
-        done: 0,
-        active: 1
+        done: 1,
+        active: 0
     } as const
 
     //hooks
@@ -39,7 +39,7 @@ export const Task = ({task, changeTaskEditMode}: Props) => {
         const changeTaskTitleModel: UpdateTaskModel = {...model, title}
         updateTask({todolistId, taskId, model: changeTaskTitleModel})
     }
-    const changeTaskStatus = (e: ChangeEvent<HTMLInputElement>) => {
+    const changeTaskStatus = () => {
         const updateTaskStatusModel = {...model, status: status === TaskStatuses.active ? TaskStatuses.done : TaskStatuses.active}
         updateTask({todolistId, taskId, model: updateTaskStatusModel})
     }
@@ -54,15 +54,15 @@ export const Task = ({task, changeTaskEditMode}: Props) => {
                     sx={{padding: 0}}
                     color={"default"}
                     onChange={changeTaskStatus}
-                    value={!status}
-                    checked={!status}
+                    value={!!status}
+                    checked={!!status}
                 />
                 <EditableSpan
                     isEditMode={task.isEditMode}
                     title={task.title}
                     changeItemTitle={changeTaskTitleHandler}
                     changeItemEditMode={changeTaskEditModeHandler}
-                    isDone={!status}
+                    isDone={!!status}
                 />
             </div>
             <CRUDButtons

@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
-import {Wrapper} from "./components/Wrapper/Wrapper";
-import {Header} from "./components/Header/Header";
-import {Container} from "./components/Container/Container";
-import {Todolist} from "./components/Todolist/Todolist";
-import {AddItemForm} from "./components/AddItemForm/AddItemForm";
-import {useAppDispatch} from "./bll/store";
-import {todolistsApi, useAddTodolistMutation, useGetTodolistsQuery} from "./dal/api/todolistsApi";
+import {Wrapper} from "../components/Wrapper/Wrapper";
+import {Header} from "../components/Header/Header";
+import {Container} from "../components/Container/Container";
+import {Todolist} from "../components/Todolist/Todolist";
+import {AddItemForm} from "../components/AddItemForm/AddItemForm";
+import {useAppDispatch} from "../bll/store";
+import {todolistsApi, useAddTodolistMutation, useGetTodolistsQuery} from "../dal/api/todolistsApi";
 
 function App() {
 
