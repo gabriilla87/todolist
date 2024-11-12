@@ -2,51 +2,57 @@ import React, {useEffect, useRef, useState} from 'react';
 import s from './Todolist.module.css'
 import {CollapseArrow} from "../CollapseArrow/CollapseArrow";
 import {AddItemForm} from "../AddItemForm/AddItemForm";
-import {RootState, useAppDispatch} from "../../bll/store";
-import {useSelector} from "react-redux";
-import {addTask, DomainTask} from "../../bll/reducers/taskReducer";
 import {Task} from "../Task/Task";
-import {
-    changeTodolistEditMode,
-    changeTodolistTitle,
-    DomainTodolist,
-    removeTodolist
-} from "../../bll/reducers/todolistReducer";
-import {v1} from "uuid";
+import {DomainTodolist} from "../../bll/reducers/todolistsSlice";
 import {CRUDButtons} from "../CRUDButtonsWrapper/CRUDButtons";
 import {EditableSpan} from "../EditableSpan/EditableSpan";
+import {useRemoveTodolistMutation, useUpdateTodolistTitleMutation} from "../../dal/api/todolistsApi";
+import {tasksApi, useAddTaskMutation, useGetTasksQuery} from "../../dal/api/tasksApi";
+import {useAppDispatch} from "../../bll/store";
 
+//types
 type Props = {
     todolist: DomainTodolist
+    changeTodolistEditMode: ({todolistId, isEditMode}: {todolistId: string, isEditMode: boolean}) => void
+}
+export type ChangeTaskEditMode = {
+    todolistId: string
+    taskId: string
+    isEditMode: boolean
 }
 
-export const Todolist = ({todolist}: Props) => {
+export const Todolist = ({todolist, changeTodolistEditMode}: Props) => {
     const {title, id: todolistId, isEditMode} = todolist
 
+    //hooks
+    const {data: tasks} = useGetTasksQuery(todolistId)
+    const [removeTodolist] = useRemoveTodolistMutation()
+    const [updateTodolistTitle] = useUpdateTodolistTitleMutation()
+    const [addTask] = useAddTaskMutation()
     const [isOpen, toggleIsOpen] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null);
-
     const dispatch = useAppDispatch()
-    const tasks = useSelector<RootState, DomainTask[]>(state => state.tasks[todolistId])
 
+    //handlers
     const toggleOpen = () => {
         toggleIsOpen(prev => !prev);
     };
-
     const addTaskHandler = (title: string) => {
-        dispatch(addTask({todolistId, id: v1(), title}))
+        addTask({todolistId, title})
     }
-
     const removeTodolistHandler = () => {
-        dispatch(removeTodolist({todolistId}))
+        removeTodolist(todolistId)
     }
-
     const changeTodolistTitleHandler = (title: string) => {
-        dispatch(changeTodolistTitle({todolistId, title}))
+        updateTodolistTitle({todolistId, title})
     }
-
     const changeTodolistEditModeHandler = (isEditMode: boolean) => {
-        dispatch(changeTodolistEditMode({todolistId, isEditMode}))
+        changeTodolistEditMode({todolistId, isEditMode})
+    }
+    const changeTaskEditMode = ({todolistId, taskId, isEditMode}: ChangeTaskEditMode) => {
+        if (!tasks) return;
+        const updatedTasks = tasks.map(t => t.id === taskId ? {...t, isEditMode: isEditMode} : t);
+        dispatch(tasksApi.util.upsertQueryData('getTasks', todolistId, updatedTasks));
     }
 
     useEffect(() => {
@@ -67,7 +73,7 @@ export const Todolist = ({todolist}: Props) => {
                             changeItemTitle={changeTodolistTitleHandler}
                             changeItemEditMode={changeTodolistEditModeHandler}
                         />
-                        <span className={s.numOfTasks}>Tasks: 0</span>
+                        <span className={s.numOfTasks}>Tasks: {tasks?.length}</span>
                     </div>
                     <CRUDButtons
                         removeItem={removeTodolistHandler}
@@ -85,7 +91,7 @@ export const Todolist = ({todolist}: Props) => {
             >
                 <span className={s.underline} style={{margin: isOpen ? "0 auto 10px" : "0 auto"}}></span>
                 <AddItemForm addItem={addTaskHandler} placeholder={"Task title"}/>
-                {tasks?.map(el => <Task task={el} todolistId={todolistId}/>)}
+                {tasks?.map(el => <Task key={el.id} task={el} changeTaskEditMode={changeTaskEditMode}/>)}
             </div>
         </div>
     );

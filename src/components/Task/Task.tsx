@@ -1,37 +1,44 @@
 import React, {useState} from 'react';
 import s from "./Task.module.css"
-import {changeTaskEditMode, changeTaskTitle, DomainTask, removeTask} from "../../bll/reducers/taskReducer";
 import {CRUDButtons} from "../CRUDButtonsWrapper/CRUDButtons";
 import {EditableSpan} from "../EditableSpan/EditableSpan";
-import {useAppDispatch} from "../../bll/store";
 import {Checkbox} from "@mui/material";
+import {DomainTask, UpdateTaskModel, useRemoveTaskMutation, useUpdateTaskMutation} from "../../dal/api/tasksApi";
+import {ChangeTaskEditMode} from "../Todolist/Todolist";
 
 type Props = {
-    task: DomainTask
-    todolistId: string
+    task: DomainTask,
+    changeTaskEditMode: (args: ChangeTaskEditMode) => void
 }
 
-export const Task = ({task, todolistId}: Props) => {
-    const {id: taskId, isEditMode} = task
+export const Task = ({task, changeTaskEditMode}: Props) => {
+    const {id: taskId, isEditMode, todoListId: todolistId} = task
 
+    //hooks
+    const [removeTask] = useRemoveTaskMutation()
+    const [updateTask] = useUpdateTaskMutation()
     const [isDone, setIsDone] = useState(false);
 
-    const dispatch = useAppDispatch()
-
+    //handlers
     const switchIsStrikethrough = () => {
         setIsDone(prev => !prev)
     }
-
-    const changeTaskTitleHandler = (title: string) => {
-        dispatch(changeTaskTitle({todolistId, taskId, title}))
-    }
-
     const changeTaskEditModeHandler = (isEditMode: boolean) => {
-        dispatch(changeTaskEditMode({todolistId, taskId, isEditMode}))
+        changeTaskEditMode({todolistId, taskId, isEditMode})
     }
-
+    const changeTaskTitleHandler = (title: string) => {
+        const model: UpdateTaskModel = {
+            title,
+            deadline: task.deadline,
+            description: task.description,
+            priority: task.priority,
+            status: task.status,
+            startDate: task.startDate
+        }
+        updateTask({todolistId, taskId, model})
+    }
     const removeTaskHandler = () => {
-        dispatch(removeTask({todolistId, taskId}))
+        removeTask({todolistId, taskId})
     }
 
     return (
