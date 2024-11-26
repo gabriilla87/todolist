@@ -1,49 +1,44 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import {Wrapper} from "../components/Wrapper/Wrapper";
 import {Header} from "../components/Header/Header";
 import {Container} from "../components/Container/Container";
-import {Todolist} from "../components/Todolist/Todolist";
-import {AddItemForm} from "../components/AddItemForm/AddItemForm";
-import {useAppDispatch} from "../bll/store";
-import {todolistsApi, useAddTodolistMutation, useGetTodolistsQuery} from "../dal/api/todolistsApi";
+import {useAppDispatch} from "./store";
+import {Outlet} from "react-router-dom";
+import {useMeQuery} from "../dal/api/authApi";
+import {ResultCode} from "../enums/enums";
+import {setIsLoggedIn} from "./appSlice";
+import {CircularProgress} from "@mui/material";
 
 function App() {
+    const [isInitialized, setIsInitialized] = useState(false)
 
     const dispatch = useAppDispatch()
-    // const todolists = useSelector<RootState, DomainTodolist[]>(state => state.todolists)
 
-    const {data: todolists} = useGetTodolistsQuery()
-    const [addTodolist] = useAddTodolistMutation()
+    const {data, isLoading} = useMeQuery()
 
-    const addTodolistHandler = (title: string) => {
-        addTodolist(title)
+    useEffect(() => {
+        if (!isLoading) {
+            setIsInitialized(true)
+            if (data?.resultCode === ResultCode.SUCCESS) {
+                dispatch(setIsLoggedIn({isLoggedIn: true}))
+            }
+        }
+    }, [dispatch, isLoading, data])
+
+    if (!isInitialized) {
+        return (
+            <div style={{position: "fixed", top: "30%", textAlign: "center", width: "100%"}}>
+                <CircularProgress/>
+            </div>
+        );
     }
-
-    const changeTodolistEditMode = ({todolistId, isEditMode}: { todolistId: string, isEditMode: boolean }) => {
-        if (!todolists) return;
-        const updatedTodolists = todolists.map(tl => tl.id === todolistId ? {...tl, isEditMode: isEditMode} : tl);
-        dispatch(todolistsApi.util.upsertQueryData('getTodolists', undefined, updatedTodolists));
-    }
-
-    // useEffect(() => {
-    //     dispatch(fetchTodolists())
-    // }, [dispatch]);
 
     return (
         <Wrapper>
             <Header/>
             <Container>
-                <AddItemForm addItem={addTodolistHandler} placeholder={"Todolist title"}/>
-                {todolists?.map(tl => {
-                    return (
-                        <Todolist
-                            key={tl.id}
-                            todolist={tl}
-                            changeTodolistEditMode={changeTodolistEditMode}
-                        />
-                    )
-                })}
+                <Outlet/>
             </Container>
         </Wrapper>
     );

@@ -1,9 +1,21 @@
 .header {
     position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     right: 0;
     top: 0;
     left: 0;
     height: 60px;
     background-color: rgb(21, 21, 21);
     margin-bottom: 60px;
+    padding: 0 40px;
+}
+
+.logOutButton {
+    border: none;
+    background-color: transparent;
+    text-decoration: underline;
+    color: white;
+    cursor: pointer;
 }

@@ -1,5 +1,5 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 import {CommonResponse} from "./todolistsApi";
+import {baseApi} from "../../app/baseApi";
 
 export type TaskResponse = {
     description: string
@@ -23,23 +23,14 @@ export type DomainTask = TaskResponse & {
 }
 export type UpdateTaskModel = Omit<TaskResponse, 'id' | 'todoListId' | 'order' | 'addedDate'>
 
-export const tasksApi = createApi({
-    reducerPath: 'tasksApi',
-    tagTypes: ['tasks'],
-    baseQuery: fetchBaseQuery({
-        baseUrl: process.env.REACT_APP_BASE_URL,
-        prepareHeaders: headers => {
-            headers.set('API-KEY', `${process.env.REACT_APP_API_KEY}`)
-            headers.set('Authorization', `Bearer ${process.env.REACT_APP_AUTH_TOKEN}`)
-        }
-    }),
+export const tasksApi = baseApi.injectEndpoints({
     endpoints: builder => ({
         getTasks: builder.query<DomainTask[], string>({
             query: (todolistId) => `todo-lists/${todolistId}/tasks?count=100`,
             transformResponse: (response: GetTasksResponse): DomainTask[] => {
                 return response.items.map(t => ({...t, isEditMode: false}))
             },
-            providesTags: ['tasks']
+            providesTags: ['Task']
         }),
         addTask: builder.mutation<TaskResponse, { todolistId: string, title: string }>({
             query: ({todolistId, title}) => ({
@@ -47,14 +38,14 @@ export const tasksApi = createApi({
                 method: 'POST',
                 body: {title}
             }),
-            invalidatesTags: ['tasks']
+            invalidatesTags: ['Task']
         }),
         removeTask: builder.mutation<CommonResponse, { todolistId: string, taskId: string }>({
             query: ({todolistId, taskId}) => ({
                 url: `todo-lists/${todolistId}/tasks/${taskId}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: ['tasks']
+            invalidatesTags: ['Task']
         }),
         updateTask: builder.mutation<CommonResponse<{ item: TaskResponse }>,
             { todolistId: string, taskId: string, model: UpdateTaskModel }>({
@@ -63,9 +54,24 @@ export const tasksApi = createApi({
                 method: 'PUT',
                 body: {...model}
             }),
-            invalidatesTags: ['tasks']
+            invalidatesTags: ['Task']
+        }),
+        changeTaskOrder: builder.mutation<CommonResponse, { todolistId: string, taskId: string, putAfterTaskId: string | null }>({
+            query: ({todolistId, taskId, putAfterTaskId}) => ({
+                url: `todo-lists/${todolistId}/tasks/${taskId}/reorder`,
+                method: 'PUT',
+                body: {
+                    putAfterItemId: putAfterTaskId
+                }
+            }),
+            invalidatesTags: ['Task']
         })
-    })
-})
+    })})
 
-export const {useGetTasksQuery, useAddTaskMutation, useRemoveTaskMutation, useUpdateTaskMutation} = tasksApi
+export const {
+    useGetTasksQuery,
+    useAddTaskMutation,
+    useRemoveTaskMutation,
+    useUpdateTaskMutation,
+    useChangeTaskOrderMutation
+} = tasksApi

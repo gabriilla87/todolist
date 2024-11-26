@@ -9,8 +9,24 @@
     position: relative;
 }
 
+.taskWrapper:focus {
+    cursor: grabbing;
+}
+
 .checkboxAndTitleWrapper {
     display: flex;
     align-items: center;
     gap: 10px
+}
+
+.buttonsAndIconsWrapper {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+}
+
+.iconsWrapper {
+    display: flex;
+    align-items: center;
+    cursor: grab;
 }
