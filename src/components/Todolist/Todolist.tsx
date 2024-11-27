@@ -15,12 +15,20 @@ import {
 } from "../../dal/api/tasksApi";
 import {useAppDispatch} from "../../app/store";
 import {arrayMove, SortableContext, verticalListSortingStrategy} from "@dnd-kit/sortable";
-import {closestCorners, DndContext, DragEndEvent, useDroppable} from "@dnd-kit/core";
+import {
+    closestCorners,
+    DndContext,
+    DragEndEvent, MouseSensor,
+    TouchSensor,
+    useDroppable,
+    useSensor,
+    useSensors
+} from "@dnd-kit/core";
 
 //types
 type Props = {
     todolist: DomainTodolist
-    changeTodolistEditMode: ({todolistId, isEditMode}: {todolistId: string, isEditMode: boolean}) => void
+    changeTodolistEditMode: ({todolistId, isEditMode}: { todolistId: string, isEditMode: boolean }) => void
 }
 export type ChangeTaskEditMode = {
     todolistId: string
@@ -30,6 +38,9 @@ export type ChangeTaskEditMode = {
 
 export const Todolist = ({todolist, changeTodolistEditMode}: Props) => {
     const {title, id: todolistId, isEditMode} = todolist
+    const mouseSensor = useSensor(MouseSensor, {activationConstraint: {distance: 10}});
+    const touchSensor = useSensor(TouchSensor, {activationConstraint: {delay: 200, tolerance: 5}});
+    const sensors = useSensors(mouseSensor, touchSensor);
 
     //hooks
     const {data: tasks, isSuccess} = useGetTasksQuery(todolistId)
@@ -37,7 +48,7 @@ export const Todolist = ({todolist, changeTodolistEditMode}: Props) => {
     const [removeTodolist] = useRemoveTodolistMutation()
     const [updateTodolistTitle] = useUpdateTodolistTitleMutation()
     const [addTask] = useAddTaskMutation()
-    const { setNodeRef } = useDroppable({
+    const {setNodeRef} = useDroppable({
         id: todolistId
     });
     const [isOpen, toggleIsOpen] = useState(false)
@@ -117,7 +128,8 @@ export const Todolist = ({todolist, changeTodolistEditMode}: Props) => {
                         removeItem={removeTodolistHandler}
                         changeItemEditMode={changeTodolistEditModeHandler}
                         isEditMode={isEditMode}
-                    />                </div>
+                    />
+                </div>
                 <CollapseArrow isOpen={isOpen}/>
             </div>
             <div
@@ -129,10 +141,11 @@ export const Todolist = ({todolist, changeTodolistEditMode}: Props) => {
             >
                 <span className={s.underline} style={{margin: isOpen ? "0 auto 10px" : "0 auto"}}></span>
                 <AddItemForm addItem={addTaskHandler} placeholder={"Task title"}/>
-                <DndContext onDragEnd={onDragEndHandler} collisionDetection={closestCorners}>
+                <DndContext sensors={sensors} onDragEnd={onDragEndHandler} collisionDetection={closestCorners}>
                     <SortableContext items={preloadedTasks || []} strategy={verticalListSortingStrategy}>
                         <div ref={setNodeRef}>
-                            {isSuccess ? preloadedTasks?.map(el => <Task key={el.id} task={el} changeTaskEditMode={changeTaskEditMode}/>) : ""}
+                            {isSuccess ? preloadedTasks?.map(el => <Task key={el.id} task={el}
+                                                                         changeTaskEditMode={changeTaskEditMode}/>) : ""}
                         </div>
                     </SortableContext>
                 </DndContext>
