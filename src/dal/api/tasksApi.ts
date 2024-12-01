@@ -20,6 +20,7 @@ export type GetTasksResponse = {
 }
 export type DomainTask = TaskResponse & {
     isEditMode: boolean
+    isDisabled: boolean
 }
 export type UpdateTaskModel = Omit<TaskResponse, 'id' | 'todoListId' | 'order' | 'addedDate'>
 
@@ -28,7 +29,7 @@ export const tasksApi = baseApi.injectEndpoints({
         getTasks: builder.query<DomainTask[], string>({
             query: (todolistId) => `todo-lists/${todolistId}/tasks?count=100`,
             transformResponse: (response: GetTasksResponse): DomainTask[] => {
-                return response.items.map(t => ({...t, isEditMode: false}))
+                return response.items.map(t => ({...t, isEditMode: false, isDisabled: false}))
             },
             providesTags: ['Task']
         }),

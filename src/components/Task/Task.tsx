@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from "react";
 import s from "./Task.module.css"
-import {CRUDButtons} from "../CRUDButtonsWrapper/CRUDButtons";
+import {CRUDButtons} from "../CRUDButtons/CRUDButtons";
 import {EditableSpan} from "../EditableSpan/EditableSpan";
 import {Checkbox} from "@mui/material";
 import {
@@ -9,18 +9,20 @@ import {
     useRemoveTaskMutation,
     useUpdateTaskMutation
 } from "../../dal/api/tasksApi";
-import {ChangeTaskEditMode} from "../Todolist/Todolist";
+import { ChangeTaskEditMode, ChangeTaskIsDisabled } from "../Todolist/Todolist";
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 import dragIcon from "../../assets/svg/dragIcon.svg"
+import { TASK_STATUSES } from "../../enums/enums";
 
 type Props = {
     task: DomainTask,
     changeTaskEditMode: (args: ChangeTaskEditMode) => void
+    changeTaskIsDisabled: (args: ChangeTaskIsDisabled) => void
 }
 
-export const Task = ({task, changeTaskEditMode}: Props) => {
-    const {id: taskId, isEditMode, todoListId: todolistId, status} = task
+export const Task = ({task, changeTaskEditMode, changeTaskIsDisabled}: Props) => {
+    const {id: taskId, isDisabled, todoListId: todolistId, status} = task
     const model: UpdateTaskModel = {
         title: task.title,
         deadline: task.deadline,
@@ -30,20 +32,18 @@ export const Task = ({task, changeTaskEditMode}: Props) => {
         startDate: task.startDate
     }
 
-    const TaskStatuses = {
-        done: 1,
-        active: 0
-    } as const
-
     //hooks
-    const [removeTask] = useRemoveTaskMutation()
-    const [updateTask] = useUpdateTaskMutation()
+    const [removeTask, {isLoading: isTaskRemoving}] = useRemoveTaskMutation()
+    const [updateTask, {isLoading: isTaskUpdating}] = useUpdateTaskMutation()
 
     const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: taskId})
 
     //handlers
     const changeTaskEditModeHandler = (isEditMode: boolean) => {
         changeTaskEditMode({todolistId, taskId, isEditMode})
+    }
+    const changeTaskIsDisabledHandler = (isDisabled: boolean) => {
+        changeTaskIsDisabled({todolistId, taskId, isDisabled})
     }
     const changeTaskTitleHandler = (title: string) => {
         const changeTaskTitleModel: UpdateTaskModel = {...model, title}
@@ -52,7 +52,7 @@ export const Task = ({task, changeTaskEditMode}: Props) => {
     const changeTaskStatusHandler = () => {
         const updateTaskStatusModel = {
             ...model,
-            status: status === TaskStatuses.active ? TaskStatuses.done : TaskStatuses.active
+            status: status === TASK_STATUSES.ACTIVE ? TASK_STATUSES.DONE : TASK_STATUSES.ACTIVE
         }
         updateTask({todolistId, taskId, model: updateTaskStatusModel})
     }
@@ -64,6 +64,10 @@ export const Task = ({task, changeTaskEditMode}: Props) => {
         transition,
         transform: CSS.Transform.toString(transform)
     }
+
+    useEffect(() => {
+        changeTaskIsDisabledHandler(isTaskRemoving || isTaskUpdating)
+    }, [isTaskRemoving, isTaskUpdating]);
 
     return (
         <div className={s.taskWrapper} ref={setNodeRef} style={style}>
@@ -80,15 +84,12 @@ export const Task = ({task, changeTaskEditMode}: Props) => {
                     title={task.title}
                     changeItemTitle={changeTaskTitleHandler}
                     changeItemEditMode={changeTaskEditModeHandler}
+                    removeItem={removeTaskHandler}
+                    isDisabled={isDisabled}
                     isDone={!!status}
                 />
             </div>
             <div className={s.buttonsAndIconsWrapper}>
-                <CRUDButtons
-                    changeItemEditMode={changeTaskEditModeHandler}
-                    removeItem={removeTaskHandler}
-                    isEditMode={isEditMode}
-                />
                 <div className={s.iconsWrapper} {...attributes} {...listeners}>
                     <img src={dragIcon} alt={"drag item"}/>
                 </div>

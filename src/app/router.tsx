@@ -1,5 +1,5 @@
-import {createBrowserRouter, Navigate} from "react-router-dom";
-import {Todolists} from "../components/Todolists/Todolists";
+import {createBrowserRouter} from "react-router-dom";
+import {TodolistsList} from "../components/TodolistsList/TodolistsList";
 import {ErrorPage} from "../components/ErrorPage/ErrorPage";
 import App from "./App";
 import {LoginPage} from "../components/LoginPage/LoginPage";
@@ -11,12 +11,8 @@ export const router = createBrowserRouter([
             errorElement: <ErrorPage/>,
             children: [
                 {
-                    index: true,
-                    element: <Navigate to={"/todolist"}/>
-                },
-                {
-                    path: "/todolist",
-                    element: <Todolists/>
+                    path: "/",
+                    element: <TodolistsList/>
                 },
                 {
                     path: "/login",
@@ -24,5 +20,5 @@ export const router = createBrowserRouter([
                 }
             ]
         }
-    ], {basename: process.env.NODE_ENV === 'production' ? '/todolist' : '/'}
+    ], {basename: process.env.REACT_APP_NODE_ENV === 'production' ? '/todolist' : '/'}
 )

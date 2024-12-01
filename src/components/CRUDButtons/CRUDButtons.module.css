@@ -1,8 +1,6 @@
 .buttonsWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 10px;
+    margin-left: 5px;
+    display: inline;
     position: relative;
     z-index: 99;
 }

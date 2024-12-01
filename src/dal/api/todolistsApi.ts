@@ -15,14 +15,16 @@ export type TodolistsResponse = {
 
 export type DomainTodolist = TodolistsResponse & {
     isEditMode: boolean
+    isDisabled: boolean
 }
+
 
 export const todolistsApi = baseApi.injectEndpoints({
     endpoints: builder => ({
         getTodolists: builder.query<DomainTodolist[], void>({
             query: () => 'todo-lists',
             transformResponse(todolists: TodolistsResponse[]): DomainTodolist[] {
-                return todolists.map(tl => ({...tl, isEditMode: false}))
+                return todolists.map(tl => ({...tl, isEditMode: false, isDisabled: false}))
             },
             providesTags: ['Todolist']
         }),

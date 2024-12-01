@@ -25,8 +25,8 @@ export const Button = ({ disabled, svgProps }: Props) => {
         <button onClick={onClickHandler} className={s.button} disabled={disabled}>
             {/*<img src={imgSrc} alt={"Button"} className={s.icon}/>*/}
             <svg
-                height={'24px'}
-                width={'24px'}
+                height={'16px'}
+                width={'16px'}
                 viewBox={viewBox}
                 fill={"none"}
                 xmlns="http://www.w3.org/2000/svg"

@@ -2,13 +2,11 @@ import React, {useEffect} from 'react';
 import s from './LoginPage.module.css'
 import {FieldValues, SubmitHandler, useForm} from "react-hook-form";
 import {useLoginMutation} from "../../dal/api/authApi";
-import {ResultCode} from "../../enums/enums";
+import {RESULT_CODE} from "../../enums/enums";
 import {useSelector} from "react-redux";
 import {selectIsLoggedIn, setIsLoggedIn} from "../../app/appSlice";
 import {Navigate} from "react-router-dom";
 import {useAppDispatch} from "../../app/store";
-
-//todo: доделать ошибку неправильного логина или пароля
 
 export const LoginPage = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
@@ -28,20 +26,22 @@ export const LoginPage = () => {
     };
 
     useEffect(() => {
-        if (loginData && loginData.resultCode === ResultCode.SUCCESS) {
+        if (loginData && loginData.resultCode === RESULT_CODE.SUCCESS) {
             localStorage.setItem('sn-token', loginData.data.token)
             dispatch(setIsLoggedIn({isLoggedIn: true}))
         }
     }, [dispatch, loginData]);
 
-    if (isLoggedIn) return <Navigate to={'/'}/>
+    if (isLoggedIn) {
+        return <Navigate to={'/'}/>
+    }
 
     return (
         <div onSubmit={handleSubmit(onSubmit)} className={s.container}>
             <form className={s.form}>
                 <h2 style={{marginBottom: "5px"}}>Авторизация</h2>
                 <h6 style={{marginTop: 0}}>
-                    Данные о тестового аккаунта:<br/>
+                    Данные от тестового аккаунта:<br/>
                     Логин: free@samuraijs.com<br/>
                     Пароль: free
                 </h6>
@@ -51,7 +51,7 @@ export const LoginPage = () => {
                         className={s.input}
                         {...register("email", {required: true})}
                     />
-                    {errors.login && <p className={s.validationError}>This field is required</p>}
+                    {errors.email && <p className={s.validationError}>This field is required</p>}
                 </div>
                 <div className={s.inputGroup}>
                     <label htmlFor="password">Пароль</label>

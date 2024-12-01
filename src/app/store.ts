@@ -2,13 +2,13 @@ import {configureStore} from '@reduxjs/toolkit'
 import {useDispatch} from "react-redux";
 import {setupListeners} from "@reduxjs/toolkit/query";
 import {baseApi} from "./baseApi";
-import {appReducer} from "./appSlice";
+import { appReducer, appSlice } from "./appSlice";
 
 //store
 export const store = configureStore({
     reducer: {
         [baseApi.reducerPath]: baseApi.reducer,
-        app: appReducer
+        [appSlice.name]: appReducer
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware)
 })

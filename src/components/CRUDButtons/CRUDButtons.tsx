@@ -1,14 +1,14 @@
 import React from 'react';
 import {Button, SvgProps} from "../Button/Button";
-import s from './CRUDButtonsWrapper.module.css';
+import s from './CRUDButtons.module.css';
 
 type Props = {
     removeItem: () => void
     changeItemEditMode: (isEditMode: boolean) => void
-    isEditMode: boolean
+    isDisabled: boolean
 }
 
-export const CRUDButtons = ({changeItemEditMode, removeItem, isEditMode}: Props) => {
+export const CRUDButtons = ({changeItemEditMode, removeItem, isDisabled}: Props) => {
     const changeItemEditModeHandler = () => {
         changeItemEditMode(true)
     }
@@ -32,8 +32,8 @@ export const CRUDButtons = ({changeItemEditMode, removeItem, isEditMode}: Props)
 
     return (
         <div className={s.buttonsWrapper}>
-            {isEditMode && <div className={s.hideButtonsWrapper}/>}
-            {svgObjs.map(o => <Button key={o.id} svgProps={o} disabled={isEditMode}/>)}
+            {isDisabled && <div className={s.hideButtonsWrapper}/>}
+            {svgObjs.map(o => <Button key={o.id} svgProps={o} disabled={isDisabled}/>)}
         </div>
     );
 };

@@ -1,0 +1,18 @@
+.addItemSkeletonWrapper {
+    display: flex;
+    margin-bottom: 5px;
+    width: calc(100%);
+}
+
+.inputSkeleton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: none;
+    height: 30px;
+    border-radius: 5px;
+    background-color: rgb(84, 84, 87);
+    padding: 5px 15px;
+    color: white;
+}

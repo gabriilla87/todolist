@@ -5,21 +5,22 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 10px;
-    padding: 5px 20px;
+    padding: 10px 20px;
     background-color: #f9f9f9;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
 }
 
-
-
 .todosHeader:hover::before {
     background-color: rgb(220, 220, 220);
+    cursor: pointer;
 }
 
 .todosHeader {
     display: flex;
+    max-width: 100%;
+    width: 100%;
     position: relative;
     justify-content: space-between;
     background-color: transparent;
@@ -30,25 +31,26 @@
     position: absolute;
     content: "";
     background-color: transparent;
-    top: -5px;
+    top: -10px;
     right: -20px;
     left: -20px;
-    bottom: -5px;
+    bottom: -10px;
     border-radius: 5px 5px 0 0;
     z-index: -1
 }
 
 .todosHeaderText {
-    width: 100%;
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    flex-direction: column;
-    cursor: pointer;
-}
-
-.textWrapper {
-
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .openTodosBlock {
@@ -80,6 +82,19 @@
 .todosHeaderLeftSide {
     display: flex;
     align-items: center;
+    justify-content: center;
+}
+
+.arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    margin-right: 10px;
+    transform: rotate(30deg);
+    transform-origin: center;
+}
+
+.arrow.open {
+    transform: rotate(120deg) translateX(-3px);
 }
 
 @media screen and (max-width: 576px){
@@ -90,6 +105,8 @@
         font-size: 14px;
     }
     .todosHeader::before {
+        top: -5px;
+        bottom: -5px;
         right: -5px;
         left: -5px;
     }
