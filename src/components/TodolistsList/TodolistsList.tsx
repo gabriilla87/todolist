@@ -6,7 +6,7 @@ import { useAppDispatch } from "../../app/store";
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectIsLoggedIn } from "../../app/appSlice";
-import { TodolistSkeleton } from "../TodolistSkeleton/TodolistSkeleton";
+import { TodolistSkeleton } from "../Todolist/TodolistSkeleton/TodolistSkeleton";
 import { AddItemFormSkeleton } from "../AddItemForm/AddItemFormSkeleton";
 
 export const TodolistsList = () => {

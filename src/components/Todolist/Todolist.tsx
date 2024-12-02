@@ -1,29 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import s from "./Todolist.module.css";
-import { CollapseArrow } from "../CollapseArrow/CollapseArrow";
-import { AddItemForm } from "../AddItemForm/AddItemForm";
-import { Task } from "../Task/Task";
-import { CRUDButtons } from "../CRUDButtons/CRUDButtons";
-import { EditableSpan } from "../EditableSpan/EditableSpan";
-import { DomainTodolist, useRemoveTodolistMutation, useUpdateTodolistTitleMutation } from "../../dal/api/todolistsApi";
-import {
-  DomainTask,
-  tasksApi,
-  useAddTaskMutation,
-  useChangeTaskOrderMutation,
-  useGetTasksQuery
-} from "../../dal/api/tasksApi";
-import { useAppDispatch } from "../../app/store";
-import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import {
-  closestCorners,
-  DndContext,
-  DragEndEvent, MouseSensor,
-  TouchSensor,
-  useDroppable,
-  useSensor,
-  useSensors
-} from "@dnd-kit/core";
+import { DomainTodolist } from "../../dal/api/todolistsApi";
+import { DomainTask } from "../../dal/api/tasksApi";
+import { arrayMove } from "@dnd-kit/sortable";
+import { DragEndEvent } from "@dnd-kit/core";
+import { TodolistHeader } from "./TodolistHeader/TodolistHeader";
+import { useTodolistData } from "../../hooks/useTodolistData";
+import { TodolistBody } from "./TodolistBody/TodolistBody";
 
 //types
 type Props = {
@@ -42,52 +25,36 @@ export type ChangeTaskIsDisabled = Omit<ChangeTaskEditMode, "isEditMode"> & {
 
 export const Todolist = ({ todolist, changeTodolistEditMode, changeTodolistIsDisabled }: Props) => {
   const { title, id: todolistId, isEditMode, isDisabled } = todolist;
-  const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } });
-  const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } });
-  const sensors = useSensors(mouseSensor, touchSensor);
 
   //hooks
-  const { data: tasks, isSuccess } = useGetTasksQuery(todolistId);
-  const [changeTaskOrder] = useChangeTaskOrderMutation();
-  const [removeTodolist, { isLoading: isTodolistRemoving }] = useRemoveTodolistMutation();
-  const [updateTodolistTitle] = useUpdateTodolistTitleMutation();
-  const [addTask] = useAddTaskMutation();
-  const { setNodeRef } = useDroppable({
-    id: todolistId
-  });
-  const [isOpen, toggleIsOpen] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const dispatch = useAppDispatch();
-  const [preloadedTasks, setPreloadedTasks] = useState<DomainTask[]>();
+  const {
+    sensors,
+    tasks,
+    isSuccess,
+    changeTaskOrder,
+    removeTodolist,
+    isTodolistRemoving,
+    addTask,
+    setNodeRef,
+    isOpen,
+    toggleIsOpen,
+    contentRef,
+    preloadedTasks,
+    setPreloadedTasks
+  } = useTodolistData(todolistId);
 
   //handlers
-  const toggleOpen = () => {
+  const toggleIsOpenHandler = () => {
     toggleIsOpen(prev => !prev);
-  };
-  const addTaskHandler = (title: string) => {
-    addTask({ todolistId, title });
   };
   const removeTodolistHandler = () => {
     removeTodolist(todolistId);
   };
-  const changeTodolistTitleHandler = (title: string) => {
-    updateTodolistTitle({ todolistId, title });
-  };
-  const changeTodolistEditModeHandler = (isEditMode: boolean) => {
+  const changeTodolistEditModeHandler = () => {
     changeTodolistEditMode({ todolistId, isEditMode });
   };
   const changeTodolistIsDisabledHandler = (isDisabled: boolean) => {
     changeTodolistIsDisabled({ todolistId, isDisabled });
-  };
-  const changeTaskEditMode = ({ todolistId, taskId, isEditMode }: ChangeTaskEditMode) => {
-    if (!tasks) return;
-    const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, isEditMode, isDisabled: isEditMode } : t);
-    dispatch(tasksApi.util.upsertQueryData("getTasks", todolistId, updatedTasks));
-  };
-  const changeTaskIsDisabled = ({ todolistId, taskId, isDisabled }: ChangeTaskIsDisabled) => {
-    if (!tasks) return;
-    const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, isDisabled } : t);
-    dispatch(tasksApi.util.upsertQueryData("getTasks", todolistId, updatedTasks));
   };
   const findTaskIndex = (id: string) => preloadedTasks?.findIndex(el => el.id === id);
   const onDragEndHandler = (event: DragEndEvent) => {
@@ -110,13 +77,15 @@ export const Todolist = ({ todolist, changeTodolistEditMode, changeTodolistIsDis
     setPreloadedTasks(tasks => arrayMove(tasks as DomainTask[], originalPos as number, newPos as number));
     changeTaskOrder({ todolistId, taskId: `${active.id}`, putAfterTaskId });
   };
-
+  const addTaskHandler = (title: string) => {
+    addTask({ todolistId, title });
+  };
 
   useEffect(() => {
     if (contentRef.current) {
       contentRef.current.style.maxHeight = isOpen ? `${contentRef.current.scrollHeight + 20}px` : "0";
     }
-  }, [isOpen, tasks, preloadedTasks]);
+  }, [isOpen, tasks, preloadedTasks, contentRef]);
 
   useEffect(() => {
     if (isSuccess) setPreloadedTasks(tasks);
@@ -128,44 +97,28 @@ export const Todolist = ({ todolist, changeTodolistEditMode, changeTodolistIsDis
 
   return (
     <div className={s.todolistWrapper}>
-      <div className={s.todosHeader} onClick={toggleOpen}>
-        <div className={s.todosHeaderLeftSide}>
-          <CollapseArrow isOpen={isOpen} />
-          <div className={s.todosHeaderText}>
-              <EditableSpan
-                isEditMode={isEditMode}
-                title={title}
-                changeItemTitle={changeTodolistTitleHandler}
-                changeItemEditMode={changeTodolistEditModeHandler}
-                removeItem={removeTodolistHandler}
-                isDisabled={isDisabled}
-              />
-            <span className={s.numOfTasks}>Tasks: {tasks?.length}</span>
-          </div>
-        </div>
-      </div>
-      <div
-        className={s.openTodosBlock}
-        ref={contentRef}
-        style={{
-          opacity: isOpen ? 1 : 0
-        }}
-      >
-        <span className={s.underline} style={{ margin: isOpen ? "5px auto 10px" : "0 auto" }}></span>
-        <AddItemForm addItem={addTaskHandler} placeholder={"Task title"} />
-        <DndContext sensors={sensors} onDragEnd={onDragEndHandler} collisionDetection={closestCorners}>
-          <SortableContext items={preloadedTasks || []} strategy={verticalListSortingStrategy}>
-            <div ref={setNodeRef}>
-              {isSuccess && preloadedTasks?.map(el => <Task
-                key={el.id}
-                task={el}
-                changeTaskEditMode={changeTaskEditMode}
-                changeTaskIsDisabled={changeTaskIsDisabled}
-              />)}
-            </div>
-          </SortableContext>
-        </DndContext>
-      </div>
+      <TodolistHeader
+        title={title}
+        isDisabled={isDisabled}
+        isEditMode={isEditMode}
+        isOpen={isOpen}
+        todolistId={todolistId}
+        numOfItems={tasks?.length}
+        toggleIsOpen={toggleIsOpenHandler}
+        removeTodolist={removeTodolistHandler}
+        changeTodolistEditMode={changeTodolistEditModeHandler}
+      />
+      <TodolistBody
+        onDragEnd={onDragEndHandler}
+        addTask={addTaskHandler}
+        setNodeRef={setNodeRef}
+        contentRef={contentRef}
+        sensors={sensors}
+        preloadedTasks={preloadedTasks}
+        tasks={tasks}
+        isOpen={isOpen}
+        isSuccess={isSuccess}
+      />
     </div>
   );
 };
