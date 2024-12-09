@@ -24,11 +24,10 @@ export type ChangeTaskIsDisabled = Omit<ChangeTaskEditMode, "isEditMode"> & {
 }
 
 export const Todolist = ({ todolist, changeTodolistEditMode, changeTodolistIsDisabled }: Props) => {
-  const { title, id: todolistId, isEditMode, isDisabled } = todolist;
+  const { id: todolistId, isEditMode } = todolist;
 
   //hooks
   const {
-    sensors,
     tasks,
     isSuccess,
     changeTaskOrder,
@@ -86,11 +85,9 @@ export const Todolist = ({ todolist, changeTodolistEditMode, changeTodolistIsDis
       contentRef.current.style.maxHeight = isOpen ? `${contentRef.current.scrollHeight + 20}px` : "0";
     }
   }, [isOpen, tasks, preloadedTasks, contentRef]);
-
   useEffect(() => {
     if (isSuccess) setPreloadedTasks(tasks);
   }, [isSuccess, tasks]);
-
   useEffect(() => {
     changeTodolistIsDisabledHandler(isTodolistRemoving);
   }, [isTodolistRemoving]);
@@ -98,11 +95,8 @@ export const Todolist = ({ todolist, changeTodolistEditMode, changeTodolistIsDis
   return (
     <div className={s.todolistWrapper}>
       <TodolistHeader
-        title={title}
-        isDisabled={isDisabled}
-        isEditMode={isEditMode}
+        todolist={todolist}
         isOpen={isOpen}
-        todolistId={todolistId}
         numOfItems={tasks?.length}
         toggleIsOpen={toggleIsOpenHandler}
         removeTodolist={removeTodolistHandler}
@@ -113,7 +107,6 @@ export const Todolist = ({ todolist, changeTodolistEditMode, changeTodolistIsDis
         addTask={addTaskHandler}
         setNodeRef={setNodeRef}
         contentRef={contentRef}
-        sensors={sensors}
         preloadedTasks={preloadedTasks}
         tasks={tasks}
         isOpen={isOpen}

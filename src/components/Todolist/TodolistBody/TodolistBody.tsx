@@ -1,12 +1,13 @@
 import React, { RefObject } from "react";
 import s from "../Todolist.module.css";
 import { AddItemForm } from "../../AddItemForm/AddItemForm";
-import { closestCorners, DndContext, DragEndEvent, SensorDescriptor, SensorOptions } from "@dnd-kit/core";
+import { closestCorners, DndContext, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Task } from "../../Task/Task";
 import { DomainTask, tasksApi } from "../../../dal/api/tasksApi";
 import { ChangeTaskEditMode, ChangeTaskIsDisabled } from "../Todolist";
 import { useAppDispatch } from "../../../app/store";
+import { useTodolistBodyData } from "../../../hooks/useTodolistBodyData";
 
 type Props = {
   onDragEnd: (event: DragEndEvent) => void
@@ -15,7 +16,6 @@ type Props = {
   contentRef: RefObject<HTMLDivElement>
   isOpen: boolean
   isSuccess: boolean
-  sensors: SensorDescriptor<SensorOptions>[]
   preloadedTasks: DomainTask[] | undefined
   tasks: DomainTask[] | undefined
 }
@@ -27,11 +27,12 @@ export const TodolistBody = (props: Props) => {
     setNodeRef,
     contentRef,
     isOpen,
-    sensors,
     preloadedTasks,
     isSuccess,
     tasks
   } = props
+
+  const {sensors} = useTodolistBodyData()
 
   const dispatch = useAppDispatch()
 

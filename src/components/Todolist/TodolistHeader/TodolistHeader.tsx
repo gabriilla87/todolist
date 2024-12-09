@@ -2,13 +2,10 @@ import React from 'react';
 import s from "./TodolistHeader.module.css";
 import { CollapseArrow } from "../../CollapseArrow/CollapseArrow";
 import { EditableSpan } from "../../EditableSpan/EditableSpan";
-import { useUpdateTodolistTitleMutation } from "../../../dal/api/todolistsApi";
+import { DomainTodolist, useUpdateTodolistTitleMutation } from "../../../dal/api/todolistsApi";
 
 type Props = {
-  title: string
-  todolistId: string
-  isEditMode: boolean
-  isDisabled: boolean
+  todolist: DomainTodolist
   isOpen: boolean
   numOfItems: number | undefined
   removeTodolist: () => void
@@ -21,13 +18,12 @@ export const TodolistHeader = (props: Props) => {
     removeTodolist,
     toggleIsOpen,
     changeTodolistEditMode,
-    isDisabled,
-    isEditMode,
     isOpen,
-    title,
-    todolistId,
+    todolist,
     numOfItems
   } = props
+
+  const { title, id: todolistId, isEditMode, isDisabled } = todolist
 
   const [updateTodolistTitle] = useUpdateTodolistTitleMutation();
 
